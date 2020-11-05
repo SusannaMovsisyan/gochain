@@ -1,0 +1,39 @@
+version: '3.6'
+
+networks:
+  gochain_net:
+
+services:
+  db:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_DB: susannadb
+      POSTGRES_PASSWORD: susanna
+    volumes:
+      - './postgres/data:/var/lib/postgresql/data'
+    ports:
+      - '4444:4444'
+    networks:
+      - gochain_net
+
+
+  my_gochain:
+    image: my_gochain
+    build:
+      context: .
+      dockerfile: dockerfile
+    environment:
+      IP: 0.0.0.0
+      POSTGRES_URL: db
+      PERSISTENCE_TYPE: postgres
+      POSTGRES_PASSWORD: susanna
+      PORT: 8000
+    ports:
+      - '8000:8000'
+    links:
+      - db
+    depends_on:
+      - 'db'
+    networks:
+      - gochain_net
